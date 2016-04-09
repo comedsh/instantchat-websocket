@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8" />
+<head>
+	<style type="text/css">
+	</style>
+</head>
+
+<span> Netty WebSocket 案例：</span>
+
+<br>
+
+<body>
+
+	<br>
+	<script type="text/javascript">
+		var socket;
+
+		if (!window.WebSocket) {
+			window.WebSocket = window.MozWebSocket;
+		}
+
+		if (window.WebSocket) {
+
+			socket = new WebSocket("ws://localhost:8080/websocket");
+
+			socket.onmessage = function(event) {
+				var ta = document.getElementById('responseText');
+				ta.value = "";
+				ta.value = event.data
+			};
+
+			socket.onopen = function(event) {
+
+				var ta = document.getElementById('responseText');
+
+				ta.value = "连接服务器成功！";
+
+				// FIXME, uses JSON for standard input. 
+				// 一旦建立连接，告诉服务器，用户的身份，是谁连接了..
+				send("user:client1");
+
+			};
+
+			socket.onclose = function(event) {
+				var ta = document.getElementById('responseText');
+				ta.value = "";
+				ta.value = "WebSocket 关闭!";
+			};
+
+		} else {
+			alert("抱歉，您的浏览器不支持WebSocket协议!");
+		}
+		
+		function send(message) {
+
+			if (!window.WebSocket) {
+				return;
+			}
+
+			if (socket.readyState == WebSocket.OPEN) {
+
+				socket.send(message);
+
+			} else {
+
+				alert("WebSocket连接没有建立成功!");
+
+			}
+
+		}
+		
+		// 将消息的格式封装为 send message: xxx to user: xxx
+		// FIXME，用 JSON 对象替换
+		function decorateMessage( message ){
+			
+			return "send message: "+message+" send to: " + document.getElementById("user").innerHTML ;
+		
+		}
+		
+		function chooseUser(username){
+			
+			document.getElementById("user").innerHTML = username;
+			
+		}
+		
+	</script>
+	
+	<div>用户列表</div>
+	
+	<br>
+	
+	<div><a href="javascript:void(0)" onclick="chooseUser('client2')" title="选择用户">client 2</a></div>
+	
+	<br>
+	
+	<div><a href="javascript:void(0)" onclick="chooseUser('client3')" title="选择用户">client 3</a></div>
+	
+	<br><br>
+	
+	<div>当前用户 Client 1</div>
+	
+	<textarea style="width: 500px; height: 100px;" id="message">填写你的消息</textarea> 
+	
+	<br><br> 
+	
+	<input type="button" value="发送消息" onclick=" if( document.getElementById('user').innerHTML != '' ){ send( decorateMessage( document.getElementById('message').value ) ); } else { alert('请选择你要聊天的用户！') }" />
+	
+	<hr color="blue" />
+	
+	<br><br>
+	
+	<div>与<span id="user" style="font-weight:600;margin-left:10px;margin-right:10px"></span>的聊天信息 </div>
+	
+	<textarea id="responseText" style="width: 500px; height: 100px;"></textarea>
+	
+</body>
+</html>
