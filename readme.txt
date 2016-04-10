@@ -19,9 +19,18 @@ client 1, client 2，client 3 可以任意通讯
        
        1.2.3 server 通过 client 2 的 channel 将消息发送给 client 2
        
-   演示过程需注意，让 client 1 和 client 2 同时和 server 保持连接，既在线状态，否则进入 #2 的场景    
+   演示过程需注意，让 client 1 和 client 2 同时和 server 保持连接，既在线状态，否则进入 #2 的场景
+   
+2. 用 Nginx 实现负载均衡， 建立 Netty 服务器集群        
+   
+   配置文件 参考 design/方向代理
+   
+   描述：
+   		NGINX自从1.3版本就开始支持WebSocket了， 通过在客户端和后端服务器之间建立起一条隧道来支持WebSocket（-> 看来用的是四层负载均衡）
 
-2. 实现离线用户消息发送和推送。
+3. 实现二进制文件传输
 
-3. 通过 Nginx 建立 NIO 集群 
+4. 实现离线用户消息发送和推送。
+
+ 
 

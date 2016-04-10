@@ -16,6 +16,10 @@ if (!window.WebSocket){
 
 if (window.WebSocket) {
 	
+	// localhost:8081 是 Netty 服务器的端口地址，如下方式就是直连
+	// socket = new WebSocket("ws://localhost:8081/websocket");
+	
+    // localhost:8080 是 mac Nginx 服务器的端口地址
 	socket = new WebSocket("ws://localhost:8080/websocket");
 
 	socket.onmessage = function( event ) {

@@ -13,7 +13,28 @@
 <body>
 
 	<br>
+
 	<script type="text/javascript">
+
+		var client1 = {
+
+			img : "head1.jpg"
+
+		}
+
+		var client2 = {
+
+			img : "head2.jgp"
+
+		}
+
+		var client3 = {
+
+			img : "head3.jgp"
+
+		}
+
+
 		var socket;
 
 		if (!window.WebSocket) {
@@ -21,31 +42,43 @@
 		}
 
 		if (window.WebSocket) {
-
+			
+			// localhost:8081 是 Netty 服务器的端口地址，如下方式就是直连
+			// socket = new WebSocket("ws://localhost:8081/websocket");
+			
+		    // localhost:8080 是 mac Nginx 服务器的端口地址
 			socket = new WebSocket("ws://localhost:8080/websocket");
-
+			
 			socket.onmessage = function(event) {
+
 				var ta = document.getElementById('responseText');
+
 				ta.value = "";
+
 				ta.value = event.data
+
 			};
 
 			socket.onopen = function(event) {
 
-				var ta = document.getElementById('responseText');
+				var ta = document.getElementById('statusText');
 
 				ta.value = "连接服务器成功！";
 
 				// FIXME, uses JSON for standard input. 
-				// 一旦建立连接，告诉服务器，用户的身份，是谁连接了..
+				// 一旦建立连接，告诉服务器，用户的身份，是谁连接了.. 以便记录连接信息
 				send("user:client1");
 
 			};
 
 			socket.onclose = function(event) {
-				var ta = document.getElementById('responseText');
+
+				var ta = document.getElementById('statusText');
+
 				ta.value = "";
+
 				ta.value = "WebSocket 关闭!";
+
 			};
 
 		} else {
@@ -79,40 +112,60 @@
 		}
 		
 		function chooseUser(username){
-			
-			document.getElementById("user").innerHTML = username;
+
+			var user = eval(username);
+
+			document.getElementById("user").innerHTML = "<img src='"+user.img+"' height='25' width='25'/>"+username;
 			
 		}
 		
 	</script>
 	
-	<div>用户列表</div>
+	<div>选择你想要聊天的用户</div>
 	
 	<br>
 	
-	<div><a href="javascript:void(0)" onclick="chooseUser('client2')" title="选择用户">client 2</a></div>
+	<table>
+		<td><img src="head2.jpg" width="25" height="25"/></td>
+		<td><a href="javascript:void(0)" onclick="chooseUser('client2')" title="选择用户">client 2</a></td>
+	</table>
 	
 	<br>
-	
-	<div><a href="javascript:void(0)" onclick="chooseUser('client3')" title="选择用户">client 3</a></div>
-	
-	<br><br>
-	
-	<div>当前用户 Client 1</div>
-	
-	<textarea style="width: 500px; height: 100px;" id="message">填写你的消息</textarea> 
-	
-	<br><br> 
-	
-	<input type="button" value="发送消息" onclick=" if( document.getElementById('user').innerHTML != '' ){ send( decorateMessage( document.getElementById('message').value ) ); } else { alert('请选择你要聊天的用户！') }" />
-	
-	<hr color="blue" />
-	
-	<br><br>
-	
+
+	<table>
+		<td><img src="head3.jpg" width="25" height="25"/></td>
+		<td><a href="javascript:void(0)" onclick="chooseUser('client3')" title="选择用户">client 3</a></td>
+	</table>
+
+	<br>
+
+	<hr color="black" />
+
+	<!-- 发送消息 -->
+	<!-- <div>当前用户 <a href="javascript:void(0)">client 1</a></div> -->
+
 	<div>与<span id="user" style="font-weight:600;margin-left:10px;margin-right:10px"></span>的聊天信息 </div>
+
+	<div id="history">
+
+	</div>
+
+	<br>
+	<textarea style="width: 500px; height: 70px;" id="message"></textarea>
+
+	<br><br>
+
+	<input type="button" value="发送消息" onclick=" if( document.getElementById('user').innerHTML != '' ){ send( decorateMessage( document.getElementById('message').value ) ); } else { alert('请选择你要聊天的用户！') }" />
+
+	<br><br>
+
+	<hr color="black" />
 	
-	<textarea id="responseText" style="width: 500px; height: 100px;"></textarea>
+	<br>
+	
+	<div>状态信息</div>
+	
+	<textarea id="statusText" style="width: 500px; height: 30px;"></textarea>
 	
 </body>
 </html>
