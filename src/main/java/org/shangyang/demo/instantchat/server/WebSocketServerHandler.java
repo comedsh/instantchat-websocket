@@ -192,9 +192,9 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     	}
     	
     	// send the message to the user
-    	if( txt.startsWith("send message:")){
+    	if( txt.startsWith("message:")){
     		
-    		String message = txt.replaceFirst("send message:", "").replaceFirst("send to:.*", "").trim();
+    		String message = txt.replaceFirst("message:", "").replaceFirst("send to:.*", "").trim();
     		
     		String toUser = txt.replaceFirst(".*send to:", "").trim();
     		
@@ -208,7 +208,9 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     			
     		}else{
     			
-    			toChannel.write( new TextWebSocketFrame( message ) );
+    			toChannel.write( new TextWebSocketFrame("message:"+ message +" from:" + OnlineCheckHelper.getOnlineUser(channel)  ) );
+    			
+    			//toChannel.write( new TextWebSocketFrame( message ) );
     			
     			toChannel.flush(); // must uses flush or else the message is cached not sent
     			

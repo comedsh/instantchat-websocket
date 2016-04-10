@@ -1,85 +1,237 @@
 <!DOCTYPE html>
 <html>
+<meta charset="UTF-8" />
 <head>
-<meta charset="UTF-8">
-Netty WebSocket：客户端, 用户 Client 2
+	<style type="text/css">
+	</style>
 </head>
+
+<span> Netty WebSocket 案例：</span>
+
 <br>
-<body>
+
+<body style="font-size:12px">
+
 <br>
+
 <script type="text/javascript">
-var socket;
 
-if (!window.WebSocket){
-	window.WebSocket = window.MozWebSocket;
-}
+	var client1 = {
 
-if (window.WebSocket) {
-	
-	// localhost:8081 是 Netty 服务器的端口地址，如下方式就是直连
-	// socket = new WebSocket("ws://localhost:8081/websocket");
-	
-    // localhost:8080 是 mac Nginx 服务器的端口地址
-	socket = new WebSocket("ws://localhost:8080/websocket");
+		img : "head1.jpg",
 
-	socket.onmessage = function( event ) {
-		
-		var ta = document.getElementById('responseText');
-		
-		ta.value="";
-		
-		ta.value = event.data
-		
-	};
-	
-	socket.onopen = function(event) {
-		
-		var ta = document.getElementById('responseText');
-		
-		ta.value = "连接服务器成功！";
+		icon_xuanzhong_id : "icon1"
 
-		// FIXME, uses JSON for standard input. 
-		// 一旦建立连接，告诉服务器，用户的身份，是谁连接了..
-		send("user:client2");
-		
-	};
-	
-	socket.onclose = function(event) {
-		
-		var ta = document.getElementById('responseText');
-		
-		ta.value = "";
-		
-		ta.value = "WebSocket 关闭!";
-		
-	};
-	
-}else{
-	alert("抱歉，您的浏览器不支持WebSocket协议!");
-}
-
-function send(message) {
-	
-	if (!window.WebSocket) { return; }
-	
-	if (socket.readyState == WebSocket.OPEN) {
-		
-		socket.send(message);
-		
-	}else{
-		
-		alert("WebSocket连接没有建立成功!");
-		
 	}
-}
+
+	var client2 = {
+
+		img : "head2.jpg",
+
+		icon_xuanzhong_id : "icon2"
+
+	}
+
+	var client3 = {
+
+		img : "head3.jpg",
+
+		icon_xuanzhong_id : "icon3"
+
+	}
+
+
+	var socket;
+
+	if (!window.WebSocket) {
+		window.WebSocket = window.MozWebSocket;
+	}
+
+	if (window.WebSocket) {
+
+		// localhost:8081 是 Netty 服务器的端口地址，如下方式就是直连
+		// socket = new WebSocket("ws://localhost:8081/websocket");
+
+		// localhost:8080 是 mac Nginx 服务器的端口地址
+		socket = new WebSocket("ws://localhost:8080/websocket");
+
+		socket.onmessage = function(event) {
+
+			// the response message
+			var response = event.data;
+
+			var message = response.replace(/message:/,"").replace(/from:.*/,"");
+
+			var username = response.replace(/.*from:/,"");
+
+			//chooseUser(username);
+
+			addMessage(message, username);
+
+		};
+
+		socket.onopen = function(event) {
+
+			var ta = document.getElementById('statusText');
+
+			ta.value = "连接服务器成功！";
+
+			// FIXME, uses JSON for standard input.
+			// 一旦建立连接，告诉服务器，用户的身份，是谁连接了.. 以便记录连接信息
+			send("user:client2");
+
+		};
+
+		socket.onclose = function(event) {
+
+			var ta = document.getElementById('statusText');
+
+			ta.value = "";
+
+			ta.value = "WebSocket 关闭!";
+
+		};
+
+	} else {
+		alert("抱歉，您的浏览器不支持WebSocket协议!");
+	}
+
+	function send(message) {
+
+		if (!window.WebSocket) {
+			return;
+		}
+
+		if (socket.readyState == WebSocket.OPEN) {
+
+			socket.send(message);
+
+			document.getElementById("message").value = "";
+
+		} else {
+
+			alert("WebSocket连接没有建立成功!");
+
+		}
+
+	}
+
+	// 将消息的格式封装为 send message: xxx to user: xxx
+	// FIXME，用 JSON 对象替换
+	function decorateMessage( message ){
+
+		var to = document.getElementById("user").innerHTML;
+
+		var from = "client2";
+
+		// record the send message history
+		addMessage( message+" ( <font color='gray'>send to</font>: "+ to +" )", from ); //FIXME: this is hard code
+
+		return "message: "+message+" send to: " + to ;
+	}
+
+	function chooseUser(username){
+
+		var user = eval(username);
+
+		//document.getElementById("user").innerHTML = "<img src='"+user.img+"' height='25' width='25'/>"+username;
+
+		document.getElementById("user").innerHTML = username;
+
+
+		document.getElementById("icon1").style="display:none";
+		document.getElementById("icon3").style="display:none";
+
+		document.getElementById(user.icon_xuanzhong_id).style="display:inline";
+
+	}
+
+	function addMessage( message, username ){
+
+		var user = eval(username);
+
+		var history = document.getElementById("history");
+
+		// append the history
+		history.innerHTML += "<tr><td><img src='"+user.img+"' height='25' width='25'/></td>" +
+				"<td><a href='javascript:void(0)'>"+username+"</a>:</td>" +
+				"<td>"+message+"</td></tr>";
+
+
+	}
+
 </script>
-<form onsubmit="return false;">
-<input type="text" name="message" value="Netty最佳实践"/>
+
+<div>当前用户</div>
+
+<table>
+	<td><img src="head2.jpg" width="25" height="25"/></td>
+	<td><a href="javascript:void(0)">client 2</a></td>
+</table>
+
+<br>
+
+<div>选择你想要聊天的用户</div>
+
+<br>
+
+<table>
+	<td><img src="head1.jpg" width="25" height="25"/></td>
+	<td><a href="javascript:void(0)" onclick="chooseUser('client1')" title="选择用户">client 1</a></td>
+	<td><span style="margin-left:5px;display:none" id="icon1"><img src="xuanzhong.jpg" width="15" height="15"/></span></td>
+</table>
+
+<br>
+
+<table>
+	<td><img src="head3.jpg" width="25" height="25"/></td>
+	<td><a href="javascript:void(0)" onclick="chooseUser('client3')" title="选择用户">client 3</a></td>
+	<td><span style="margin-left:5px;display:none" id="icon3"><img src="xuanzhong.jpg" width="15" height="15"/></span></td>
+</table>
+
+<span id="user" style="font-weight:600;margin-left:10px;margin-right:10px;display:none"></span>
+
+<br>
+
+<hr color="black" />
+
+<br>
+
+<!-- 发送消息 -->
+<!-- <div>当前用户 <a href="javascript:void(0)">client 1</a></div> -->
+
+<div>聊天记录 </div>
+
+<!-- 聊天记录 -->
+<div>
+
+	<table>
+
+		<tbody id="history">
+
+		</tbody>
+
+	</table>
+
+</div>
+
+<br>
+
+<textarea style="width: 500px; height: 70px; font-size:12px" id="message"></textarea>
+
 <br><br>
-<input type="button" value="发送WebSocket请求消息" onclick="send(this.form.message.value)"/>
-<hr color="blue"/>
-<h3>服务端返回的应答消息</h3>
-<textarea id="responseText" style="width:500px;height:300px;"></textarea>
-</form>
+
+<input type="button" value="发送消息" onclick=" if( document.getElementById('user').innerHTML != '' ){ send( decorateMessage( document.getElementById('message').value ) ); } else { alert('请选择你要聊天的用户！') }" />
+
+<br><br>
+
+<hr color="black" />
+
+<br>
+
+<div>与服务器连接的状态信息</div>
+
+<textarea id="statusText" style="width: 500px; height: 30px; font-size: 12px;"></textarea>
+
 </body>
 </html>

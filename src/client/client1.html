@@ -10,7 +10,7 @@
 
 <br>
 
-<body>
+<body style="font-size:12px">
 
 	<br>
 
@@ -18,19 +18,25 @@
 
 		var client1 = {
 
-			img : "head1.jpg"
+			img : "head1.jpg",
+
+			icon_xuanzhong_id : "icon1"
 
 		}
 
 		var client2 = {
 
-			img : "head2.jgp"
+			img : "head2.jpg",
+
+			icon_xuanzhong_id : "icon2"
 
 		}
 
 		var client3 = {
 
-			img : "head3.jgp"
+			img : "head3.jpg",
+
+			icon_xuanzhong_id : "icon3"
 
 		}
 
@@ -51,11 +57,16 @@
 			
 			socket.onmessage = function(event) {
 
-				var ta = document.getElementById('responseText');
+				// the response message
+				var response = event.data;
 
-				ta.value = "";
+				var message = response.replace(/message:/,"").replace(/from:.*/,"");
 
-				ta.value = event.data
+				var username = response.replace(/.*from:/,"");
+
+				//chooseUser(username);
+
+				addMessage(message, username);
 
 			};
 
@@ -95,6 +106,8 @@
 
 				socket.send(message);
 
+				document.getElementById("message").value = "";
+
 			} else {
 
 				alert("WebSocket连接没有建立成功!");
@@ -106,8 +119,15 @@
 		// 将消息的格式封装为 send message: xxx to user: xxx
 		// FIXME，用 JSON 对象替换
 		function decorateMessage( message ){
-			
-			return "send message: "+message+" send to: " + document.getElementById("user").innerHTML ;
+
+			var to = document.getElementById("user").innerHTML;
+
+			var from = "client1";
+
+			// record the send message history
+			addMessage( message+" ( <font color='gray'>send to</font>: "+ to +" )", from ); //FIXME: this is hard code
+
+			return "message: "+message+" send to: " + to ;
 		
 		}
 		
@@ -115,12 +135,43 @@
 
 			var user = eval(username);
 
-			document.getElementById("user").innerHTML = "<img src='"+user.img+"' height='25' width='25'/>"+username;
-			
+			//document.getElementById("user").innerHTML = "<img src='"+user.img+"' height='25' width='25'/>"+username;
+
+			document.getElementById("user").innerHTML = username;
+
+
+			document.getElementById("icon2").style="display:none";
+			document.getElementById("icon3").style="display:none";
+
+			document.getElementById(user.icon_xuanzhong_id).style="display:inline";
+
+		}
+
+		function addMessage( message, username ){
+
+			var user = eval(username);
+
+			var history = document.getElementById("history");
+
+			// append the history
+			history.innerHTML += "<tr><td><img src='"+user.img+"' height='25' width='25'/></td>" +
+					             "<td><a href='javascript:void(0)'>"+username+"</a>:</td>" +
+					             "<td>"+message+"</td></tr>";
+
+
 		}
 		
 	</script>
-	
+
+	<div>当前用户</div>
+
+	<table>
+		<td><img src="head1.jpg" width="25" height="25"/></td>
+		<td><a href="javascript:void(0)">client 1</a></td>
+	</table>
+
+	<br>
+
 	<div>选择你想要聊天的用户</div>
 	
 	<br>
@@ -128,6 +179,7 @@
 	<table>
 		<td><img src="head2.jpg" width="25" height="25"/></td>
 		<td><a href="javascript:void(0)" onclick="chooseUser('client2')" title="选择用户">client 2</a></td>
+		<td><span style="margin-left:5px;display:none" id="icon2"><img src="xuanzhong.jpg" width="15" height="15"/></span></td>
 	</table>
 	
 	<br>
@@ -135,23 +187,38 @@
 	<table>
 		<td><img src="head3.jpg" width="25" height="25"/></td>
 		<td><a href="javascript:void(0)" onclick="chooseUser('client3')" title="选择用户">client 3</a></td>
+		<td><span style="margin-left:5px;display:none" id="icon3"><img src="xuanzhong.jpg" width="15" height="15"/></span></td>
 	</table>
+
+	<span id="user" style="font-weight:600;margin-left:10px;margin-right:10px;display:none"></span>
 
 	<br>
 
 	<hr color="black" />
 
+	<br>
+
 	<!-- 发送消息 -->
 	<!-- <div>当前用户 <a href="javascript:void(0)">client 1</a></div> -->
 
-	<div>与<span id="user" style="font-weight:600;margin-left:10px;margin-right:10px"></span>的聊天信息 </div>
+	<div>聊天记录 </div>
 
-	<div id="history">
+	<!-- 聊天记录 -->
+	<div>
+
+		<table>
+
+			<tbody id="history">
+
+			</tbody>
+
+		</table>
 
 	</div>
 
 	<br>
-	<textarea style="width: 500px; height: 70px;" id="message"></textarea>
+
+	<textarea style="width: 500px; height: 70px; font-size:12px" id="message"></textarea>
 
 	<br><br>
 
@@ -163,9 +230,9 @@
 	
 	<br>
 	
-	<div>状态信息</div>
+	<div>与服务器连接的状态信息</div>
 	
-	<textarea id="statusText" style="width: 500px; height: 30px;"></textarea>
+	<textarea id="statusText" style="width: 500px; height: 30px; font-size: 12px;"></textarea>
 	
 </body>
 </html>

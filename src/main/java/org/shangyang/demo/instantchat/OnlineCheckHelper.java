@@ -1,5 +1,6 @@
 package org.shangyang.demo.instantchat;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -51,6 +52,25 @@ public class OnlineCheckHelper {
 	public static boolean isUserOnline( String username ){
 		
 		return users.contains( username );
+		
+	}
+	
+	// find the user by channel
+	public static String getOnlineUser( Channel channel ){
+		
+		for( Iterator<String> iter = connections.keySet().iterator(); iter.hasNext(); ){
+			
+			String currentUser = iter.next();
+			
+			if( connections.get( currentUser ).equals(channel) ){
+				
+				System.out.println("curent user get find," + currentUser);
+				
+				return currentUser;	
+			}
+		}
+		
+		return null;
 		
 	}
 
